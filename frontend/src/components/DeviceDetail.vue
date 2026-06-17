@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="detail-overlay" @click.self="handleClose">
-    <div class="detail-panel" :class="{ warning: device?.alert }">
+    <div class="detail-panel" :class="panelClass">
       <div class="panel-header">
         <div class="header-left">
           <span class="status-dot" :class="device?.status"></span>
@@ -13,14 +13,26 @@
       <div v-if="loading" class="loading">加载中...</div>
 
       <div v-else-if="device" class="panel-body">
-        <div class="alert-banner" v-if="device.alert">
-          <span class="alert-icon">⚠️</span>
-          <div class="alert-content">
-            <strong>设备异常告警</strong>
-            <ul>
-              <li v-if="device.lowOxygen" class="alert-item">含氧量过低 ({{ device.latest?.oxygen }}% &lt; {{ device.thresholds?.oxygen_min }}%)</li>
-              <li v-if="device.motorStopped" class="alert-item">搅拌机已停转 (转速 {{ device.latest?.motor_speed }} RPM)</li>
-            </ul>
+        <div v-if="device.diagnosis" class="health-card" :class="device.diagnosis.level">
+          <div class="health-status-row">
+            <span class="health-emoji">{{ healthEmoji }}</span>
+            <div class="health-text">
+              <div class="health-title">{{ device.diagnosis.title }}</div>
+              <div class="health-message">{{ device.diagnosis.message }}</div>
+            </div>
+          </div>
+          <div v-if="device.diagnosis.level !== 'healthy' && device.diagnosis.tools" class="health-tools">
+            <span class="tools-label">🔧 师傅带齐工具：</span>
+            <span class="tools-text">{{ device.diagnosis.tools }}</span>
+          </div>
+          <div v-if="device.diagnosis.level !== 'healthy' && device.diagnosis.consecutive" class="health-consecutive">
+            <span class="consecutive-tag" :class="{ active: device.diagnosis.consecutive.lowOxygen >= device.diagnosis.consecutive.threshold }">
+              含氧量连续异常 <strong>{{ device.diagnosis.consecutive.lowOxygen }}</strong> 次
+            </span>
+            <span class="consecutive-tag" :class="{ active: device.diagnosis.consecutive.motorStopped >= device.diagnosis.consecutive.threshold }">
+              转速连续异常 <strong>{{ device.diagnosis.consecutive.motorStopped }}</strong> 次
+            </span>
+            <span class="consecutive-hint">连续 {{ device.diagnosis.consecutive.threshold }} 次以上升级为严重</span>
           </div>
         </div>
 
@@ -120,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { getDeviceDetail } from '../api'
 
 const props = defineProps({
@@ -132,6 +144,22 @@ const emit = defineEmits(['close'])
 
 const device = ref(null)
 const loading = ref(false)
+
+const healthEmoji = computed(() => {
+  const level = device.value?.diagnosis?.level
+  if (level === 'healthy') return '✅'
+  if (level === 'severe') return '🔴'
+  if (level === 'minor') return '🟡'
+  return '⚪'
+})
+
+const panelClass = computed(() => {
+  const level = device.value?.diagnosis?.level
+  if (level === 'healthy') return 'healthy'
+  if (level === 'severe') return 'severe'
+  if (level === 'minor') return 'warning'
+  return ''
+})
 
 const fetchDetail = async (id) => {
   if (!id) return
@@ -193,11 +221,19 @@ const isWarning = (item) => {
   flex-direction: column;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
   animation: slideIn 0.25s ease;
-  border-left: 4px solid #10b981;
+  border-left: 4px solid #e5e7eb;
+}
+
+.detail-panel.healthy {
+  border-left-color: #10b981;
 }
 
 .detail-panel.warning {
   border-left-color: #f59e0b;
+}
+
+.detail-panel.severe {
+  border-left-color: #ef4444;
 }
 
 @keyframes slideIn {
@@ -280,35 +316,138 @@ const isWarning = (item) => {
   padding: 20px 24px;
 }
 
-.alert-banner {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 1px solid #fbbf24;
-  border-radius: 8px;
-  padding: 14px 16px;
+.health-card {
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 20px;
+}
+
+.health-card.healthy {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 2px solid #10b981;
+}
+
+.health-card.minor {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2px solid #f59e0b;
+}
+
+.health-card.severe {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #ef4444;
+}
+
+.health-status-row {
   display: flex;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 14px;
 }
 
-.alert-icon {
-  font-size: 24px;
+.health-emoji {
+  font-size: 36px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.alert-content strong {
-  color: #92400e;
-  display: block;
+.health-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.health-title {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
   margin-bottom: 6px;
 }
 
-.alert-content ul {
-  margin: 0;
-  padding-left: 18px;
+.health-card.healthy .health-title {
+  color: #065f46;
 }
 
-.alert-item {
+.health-card.minor .health-title {
+  color: #92400e;
+}
+
+.health-card.severe .health-title {
+  color: #991b1b;
+}
+
+.health-message {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.health-card.healthy .health-message {
+  color: #047857;
+}
+
+.health-card.minor .health-message {
   color: #78350f;
+}
+
+.health-card.severe .health-message {
+  color: #7f1d1d;
+}
+
+.health-tools {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 8px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.tools-label {
   font-size: 13px;
-  line-height: 1.6;
+  font-weight: 600;
+  color: #1f2937;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.tools-text {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.health-consecutive {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.consecutive-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+.consecutive-tag.active {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+  font-weight: 600;
+}
+
+.consecutive-tag strong {
+  font-size: 14px;
+}
+
+.consecutive-hint {
+  font-size: 11px;
+  color: #9ca3af;
 }
 
 .info-section {

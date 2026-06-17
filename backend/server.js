@@ -8,6 +8,7 @@ const {
   addSensorDataBatch,
   addMultiDeviceBatch,
   getDeviceStatus,
+  generateDiagnosis,
   OXYGEN_THRESHOLD,
   MOTOR_STOP_THRESHOLD,
   MAX_RECORDS_PER_DEVICE
@@ -278,7 +279,8 @@ app.get('/api/devices', rateLimit, (req, res) => {
   const devices = getAllDevices();
   const result = devices.map(d => {
     const statusInfo = getDeviceStatus(d);
-    return { ...d, ...statusInfo };
+    const diagnosis = generateDiagnosis(d.id);
+    return { ...d, ...statusInfo, diagnosis };
   });
   res.json(result);
 });
@@ -291,10 +293,12 @@ app.get('/api/devices/:id', rateLimit, (req, res) => {
 
   const statusInfo = getDeviceStatus(device);
   const history = getSensorHistory(req.params.id, 50);
+  const diagnosis = generateDiagnosis(req.params.id);
 
   res.json({
     ...device,
     ...statusInfo,
+    diagnosis,
     history,
     thresholds: {
       oxygen_min: OXYGEN_THRESHOLD,

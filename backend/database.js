@@ -205,6 +205,134 @@ function addMultiDeviceBatch(batchItems) {
   return { totalInserted, totalSkipped, perDevice: perDeviceResults };
 }
 
+const CONSECUTIVE_THRESHOLD = 3;
+
+const DIAGNOSIS_RULES = {
+  lowOxygen: {
+    minor: {
+      title: '含氧量偏低',
+      hint: '通风口可能被厨余垃圾或杂物堵了一部分，请检查进风口和排气口是否通畅。',
+      tools: '建议携带：扳手、毛刷、手电筒'
+    },
+    severe: {
+      title: '含氧量持续过低',
+      hint: '通风系统大概率已经堵死了，也可能是鼓风机坏了不转了。降解桶里缺氧会导致厌氧发酵发臭，必须尽快处理！',
+      tools: '建议携带：扳手、鼓风机备件、通风管、毛刷、手电筒'
+    }
+  },
+  motorStopped: {
+    minor: {
+      title: '搅拌机转速异常',
+      hint: '搅拌臂可能缠上了塑料袋或者长条状垃圾，导致转动受阻，建议清理搅拌臂周围异物。',
+      tools: '建议携带：长柄钳、剪刀、绝缘手套'
+    },
+    severe: {
+      title: '搅拌机持续停转',
+      hint: '搅拌臂八成是被塑料袋或骨头卡死了，也可能电机烧了。一直不搅的话厨余会结块发酵不下去，赶紧去修！',
+      tools: '建议携带：长柄钳、剪刀、万用表、备用电机、绝缘手套'
+    }
+  },
+  both: {
+    minor: {
+      title: '含氧量低 + 搅拌异常',
+      hint: '搅拌不转导致垃圾堆在一起不透气，含氧量跟着往下掉。先把搅拌臂上的异物清掉，再检查通风口。',
+      tools: '建议携带：长柄钳、剪刀、扳手、毛刷、绝缘手套'
+    },
+    severe: {
+      title: '含氧量持续过低 + 搅拌持续停转',
+      hint: '搅拌机卡死不转，垃圾堆死不透气，双重问题叠加！必须马上派人去现场：先清搅拌臂异物，再疏通通风口，检查鼓风机是否正常。',
+      tools: '建议携带：长柄钳、剪刀、扳手、鼓风机备件、万用表、通风管、毛刷、绝缘手套'
+    }
+  }
+};
+
+function analyzeConsecutiveAnomalies(deviceId) {
+  const list = storage.sensorData[deviceId] || [];
+  if (!list.length) return { lowOxygenCount: 0, motorStoppedCount: 0 };
+
+  const recent = list.slice(-10);
+  let lowOxygenCount = 0;
+  let motorStoppedCount = 0;
+
+  for (let i = recent.length - 1; i >= 0; i--) {
+    if (recent[i].oxygen < OXYGEN_THRESHOLD) lowOxygenCount++;
+    else break;
+  }
+  for (let i = recent.length - 1; i >= 0; i--) {
+    if (recent[i].motor_speed < MOTOR_STOP_THRESHOLD) motorStoppedCount++;
+    else break;
+  }
+
+  return { lowOxygenCount, motorStoppedCount };
+}
+
+function generateDiagnosis(deviceId) {
+  const latest = getLatestSensorData(deviceId);
+  if (!latest) return null;
+
+  const { lowOxygenCount, motorStoppedCount } = analyzeConsecutiveAnomalies(deviceId);
+  const isLowOxygen = latest.oxygen < OXYGEN_THRESHOLD;
+  const isMotorStopped = latest.motor_speed < MOTOR_STOP_THRESHOLD;
+
+  if (!isLowOxygen && !isMotorStopped) {
+    return {
+      level: 'healthy',
+      title: '设备运行健康',
+      message: '含氧量和搅拌转速都在正常范围，降解机状态良好！',
+      hints: [],
+      tools: null
+    };
+  }
+
+  const severity = (count) => count >= CONSECUTIVE_THRESHOLD ? 'severe' : 'minor';
+  const hasBoth = isLowOxygen && isMotorStopped;
+
+  const hints = [];
+  let tools = null;
+
+  if (hasBoth) {
+    const rule = DIAGNOSIS_RULES.both[severity(Math.max(lowOxygenCount, motorStoppedCount))];
+    hints.push(rule.hint);
+    tools = rule.tools;
+  } else if (isLowOxygen) {
+    const rule = DIAGNOSIS_RULES.lowOxygen[severity(lowOxygenCount)];
+    hints.push(rule.hint);
+    tools = rule.tools;
+  } else {
+    const rule = DIAGNOSIS_RULES.motorStopped[severity(motorStoppedCount)];
+    hints.push(rule.hint);
+    tools = rule.tools;
+  }
+
+  const level = hasBoth
+    ? (lowOxygenCount >= CONSECUTIVE_THRESHOLD || motorStoppedCount >= CONSECUTIVE_THRESHOLD ? 'severe' : 'minor')
+    : (isLowOxygen
+      ? severity(lowOxygenCount)
+      : severity(motorStoppedCount));
+
+  let title;
+  if (hasBoth) {
+    title = DIAGNOSIS_RULES.both[severity(Math.max(lowOxygenCount, motorStoppedCount))].title;
+  } else if (isLowOxygen) {
+    title = DIAGNOSIS_RULES.lowOxygen[severity(lowOxygenCount)].title;
+  } else {
+    title = DIAGNOSIS_RULES.motorStopped[severity(motorStoppedCount)].title;
+  }
+
+  return {
+    level,
+    title,
+    message: hints[0],
+    hints,
+    tools,
+    consecutive: {
+      lowOxygen: lowOxygenCount,
+      motorStopped: motorStoppedCount,
+      threshold: CONSECUTIVE_THRESHOLD
+    }
+  };
+}
+
 function getDeviceStatus(device) {
   const latest = getLatestSensorData(device.id);
   if (!latest) return { status: 'unknown', alert: false };
@@ -244,6 +372,7 @@ module.exports = {
   addSensorDataBatch,
   addMultiDeviceBatch,
   getDeviceStatus,
+  generateDiagnosis,
   flushSync,
   OXYGEN_THRESHOLD,
   MOTOR_STOP_THRESHOLD,
