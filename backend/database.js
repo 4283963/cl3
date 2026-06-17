@@ -6,30 +6,51 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const OXYGEN_THRESHOLD = 12;
 const MOTOR_STOP_THRESHOLD = 5;
 
+const MAX_RECORDS_PER_DEVICE = 2000;
+const TOTAL_RECORDS_HARD_LIMIT = 20000;
+const SAVE_DEBOUNCE_MS = 800;
+
 let storage = {
   devices: [],
   sensorData: {}
 };
+
+let saveTimer = null;
+let dirty = false;
 
 function loadData() {
   if (fs.existsSync(DATA_FILE)) {
     try {
       const raw = fs.readFileSync(DATA_FILE, 'utf-8');
       storage = JSON.parse(raw);
+      if (!storage.devices) storage.devices = [];
+      if (!storage.sensorData) storage.sensorData = {};
       return;
     } catch (e) {
-      console.warn('读取数据文件失败，使用默认数据', e.message);
+      console.warn('[DB] 读取数据文件失败，使用默认数据:', e.message);
     }
   }
   initMockData();
 }
 
-function saveData() {
+function saveDataImmediate() {
+  if (!dirty) return;
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(storage, null, 2), 'utf-8');
+    const serialized = JSON.stringify(storage);
+    fs.writeFileSync(DATA_FILE, serialized, 'utf-8');
+    dirty = false;
   } catch (e) {
-    console.warn('保存数据失败', e.message);
+    console.error('[DB] 持久化失败:', e.message);
   }
+}
+
+function scheduleSave() {
+  dirty = true;
+  if (saveTimer) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    saveDataImmediate();
+  }, SAVE_DEBOUNCE_MS);
 }
 
 function initMockData() {
@@ -68,7 +89,8 @@ function initMockData() {
     storage.sensorData[d.id] = list;
   });
 
-  saveData();
+  dirty = true;
+  saveDataImmediate();
 }
 
 function getAllDevices() {
@@ -89,24 +111,98 @@ function getSensorHistory(deviceId, limit = 50) {
   return list.slice(-limit).reverse();
 }
 
+function enforceCapacity() {
+  let totalCount = 0;
+  for (const id in storage.sensorData) {
+    if (storage.sensorData[id].length > MAX_RECORDS_PER_DEVICE) {
+      storage.sensorData[id] = storage.sensorData[id].slice(-MAX_RECORDS_PER_DEVICE);
+    }
+    totalCount += storage.sensorData[id].length;
+  }
+  if (totalCount > TOTAL_RECORDS_HARD_LIMIT) {
+    console.warn(`[DB] 总记录数 ${totalCount} 超过硬上限 ${TOTAL_RECORDS_HARD_LIMIT}，将全局裁剪`);
+    for (const id in storage.sensorData) {
+      const keep = Math.floor(MAX_RECORDS_PER_DEVICE * 0.7);
+      storage.sensorData[id] = storage.sensorData[id].slice(-keep);
+    }
+  }
+}
+
 function addSensorData(deviceId, oxygen, motor_speed, temperature, timestamp) {
   if (!storage.sensorData[deviceId]) {
     storage.sensorData[deviceId] = [];
   }
+  const list = storage.sensorData[deviceId];
+  const nextId = list.length ? list[list.length - 1].id + 1 : 1;
   const record = {
-    id: (storage.sensorData[deviceId].slice(-1)[0]?.id || 0) + 1,
+    id: nextId,
     device_id: deviceId,
     oxygen,
     motor_speed,
     temperature,
     timestamp
   };
-  storage.sensorData[deviceId].push(record);
-  if (storage.sensorData[deviceId].length > 200) {
-    storage.sensorData[deviceId] = storage.sensorData[deviceId].slice(-200);
+  list.push(record);
+  if (list.length > MAX_RECORDS_PER_DEVICE) {
+    storage.sensorData[deviceId] = list.slice(-MAX_RECORDS_PER_DEVICE);
   }
-  saveData();
+  scheduleSave();
   return record;
+}
+
+function addSensorDataBatch(deviceId, records) {
+  if (!records || !records.length) return { inserted: 0, skipped: 0 };
+
+  if (!storage.sensorData[deviceId]) {
+    storage.sensorData[deviceId] = [];
+  }
+  const list = storage.sensorData[deviceId];
+  let nextId = list.length ? list[list.length - 1].id + 1 : 1;
+  let inserted = 0;
+  let skipped = 0;
+
+  for (const r of records) {
+    if (!r || typeof r.oxygen !== 'number' || typeof r.motor_speed !== 'number' ||
+        typeof r.temperature !== 'number' || typeof r.timestamp !== 'number') {
+      skipped++;
+      continue;
+    }
+    list.push({
+      id: nextId++,
+      device_id: deviceId,
+      oxygen: r.oxygen,
+      motor_speed: r.motor_speed,
+      temperature: r.temperature,
+      timestamp: r.timestamp
+    });
+    inserted++;
+  }
+
+  if (list.length > MAX_RECORDS_PER_DEVICE) {
+    storage.sensorData[deviceId] = list.slice(-MAX_RECORDS_PER_DEVICE);
+  }
+
+  enforceCapacity();
+  scheduleSave();
+  return { inserted, skipped };
+}
+
+function addMultiDeviceBatch(batchItems) {
+  let totalInserted = 0;
+  let totalSkipped = 0;
+  const perDeviceResults = {};
+
+  for (const item of batchItems) {
+    if (!item || !item.device_id || !Array.isArray(item.records)) {
+      continue;
+    }
+    const result = addSensorDataBatch(item.device_id, item.records);
+    perDeviceResults[item.device_id] = result;
+    totalInserted += result.inserted;
+    totalSkipped += result.skipped;
+  }
+
+  return { totalInserted, totalSkipped, perDevice: perDeviceResults };
 }
 
 function getDeviceStatus(device) {
@@ -126,6 +222,17 @@ function getDeviceStatus(device) {
   };
 }
 
+function flushSync() {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  saveDataImmediate();
+}
+
+process.on('SIGTERM', flushSync);
+process.on('SIGINT', () => { flushSync(); process.exit(0); });
+
 loadData();
 
 module.exports = {
@@ -134,7 +241,12 @@ module.exports = {
   getLatestSensorData,
   getSensorHistory,
   addSensorData,
+  addSensorDataBatch,
+  addMultiDeviceBatch,
   getDeviceStatus,
+  flushSync,
   OXYGEN_THRESHOLD,
-  MOTOR_STOP_THRESHOLD
+  MOTOR_STOP_THRESHOLD,
+  MAX_RECORDS_PER_DEVICE,
+  TOTAL_RECORDS_HARD_LIMIT
 };
