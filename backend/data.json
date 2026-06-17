@@ -1,0 +1,574 @@
+{
+  "devices": [
+    {
+      "id": "DEV001",
+      "name": "降解机-A1",
+      "community": "阳光花园小区",
+      "address": "北京市朝阳区阳光花园1号楼北侧",
+      "lat": 39.9289,
+      "lng": 116.4472,
+      "install_date": "2025-03-15",
+      "status": "online"
+    },
+    {
+      "id": "DEV002",
+      "name": "降解机-A2",
+      "community": "阳光花园小区",
+      "address": "北京市朝阳区阳光花园5号楼南侧",
+      "lat": 39.9275,
+      "lng": 116.4498,
+      "install_date": "2025-03-20",
+      "status": "online"
+    },
+    {
+      "id": "DEV003",
+      "name": "降解机-B1",
+      "community": "翠湖苑社区",
+      "address": "北京市海淀区翠湖苑东区中心广场",
+      "lat": 39.9588,
+      "lng": 116.3376,
+      "install_date": "2025-04-01",
+      "status": "online"
+    },
+    {
+      "id": "DEV004",
+      "name": "降解机-B2",
+      "community": "翠湖苑社区",
+      "address": "北京市海淀区翠湖苑西区3号岗亭旁",
+      "lat": 39.9572,
+      "lng": 116.3348,
+      "install_date": "2025-04-05",
+      "status": "online"
+    },
+    {
+      "id": "DEV005",
+      "name": "降解机-C1",
+      "community": "金色家园",
+      "address": "北京市丰台区金色家园二期东门",
+      "lat": 39.8756,
+      "lng": 116.3867,
+      "install_date": "2025-05-10",
+      "status": "online"
+    },
+    {
+      "id": "DEV006",
+      "name": "降解机-D1",
+      "community": "新华里社区",
+      "address": "北京市西城区新华里8号楼前",
+      "lat": 39.9389,
+      "lng": 116.3622,
+      "install_date": "2025-05-18",
+      "status": "online"
+    }
+  ],
+  "sensorData": {
+    "DEV001": [
+      {
+        "id": 1,
+        "device_id": "DEV001",
+        "oxygen": 18.37,
+        "motor_speed": 78.9,
+        "temperature": 57.7,
+        "timestamp": 1781664212783
+      },
+      {
+        "id": 2,
+        "device_id": "DEV001",
+        "oxygen": 18.79,
+        "motor_speed": 54,
+        "temperature": 51.52,
+        "timestamp": 1781664272783
+      },
+      {
+        "id": 3,
+        "device_id": "DEV001",
+        "oxygen": 20.87,
+        "motor_speed": 64.4,
+        "temperature": 50.14,
+        "timestamp": 1781664332783
+      },
+      {
+        "id": 4,
+        "device_id": "DEV001",
+        "oxygen": 19.48,
+        "motor_speed": 75.3,
+        "temperature": 51.6,
+        "timestamp": 1781664392783
+      },
+      {
+        "id": 5,
+        "device_id": "DEV001",
+        "oxygen": 18.27,
+        "motor_speed": 55.2,
+        "temperature": 51.97,
+        "timestamp": 1781664452783
+      },
+      {
+        "id": 6,
+        "device_id": "DEV001",
+        "oxygen": 18.14,
+        "motor_speed": 63.8,
+        "temperature": 56.83,
+        "timestamp": 1781664512783
+      },
+      {
+        "id": 7,
+        "device_id": "DEV001",
+        "oxygen": 18.6,
+        "motor_speed": 55.6,
+        "temperature": 61.02,
+        "timestamp": 1781664572783
+      },
+      {
+        "id": 8,
+        "device_id": "DEV001",
+        "oxygen": 19.6,
+        "motor_speed": 63,
+        "temperature": 50.14,
+        "timestamp": 1781664632783
+      },
+      {
+        "id": 9,
+        "device_id": "DEV001",
+        "oxygen": 22.56,
+        "motor_speed": 71.1,
+        "temperature": 49.47,
+        "timestamp": 1781664692783
+      },
+      {
+        "id": 10,
+        "device_id": "DEV001",
+        "oxygen": 18.13,
+        "motor_speed": 58.7,
+        "temperature": 57.61,
+        "timestamp": 1781664752783
+      },
+      {
+        "id": 11,
+        "device_id": "DEV001",
+        "oxygen": 19.8,
+        "motor_speed": 72.5,
+        "temperature": 55.2,
+        "timestamp": 1781665862256
+      },
+      {
+        "id": 12,
+        "device_id": "DEV001",
+        "oxygen": 8.5,
+        "motor_speed": 2,
+        "temperature": 60,
+        "timestamp": 1781665862258
+      }
+    ],
+    "DEV002": [
+      {
+        "id": 1,
+        "device_id": "DEV002",
+        "oxygen": 10.2,
+        "motor_speed": 72.6,
+        "temperature": 53.3,
+        "timestamp": 1781664212783
+      },
+      {
+        "id": 2,
+        "device_id": "DEV002",
+        "oxygen": 10.89,
+        "motor_speed": 74.3,
+        "temperature": 55.87,
+        "timestamp": 1781664272783
+      },
+      {
+        "id": 3,
+        "device_id": "DEV002",
+        "oxygen": 9.08,
+        "motor_speed": 77.5,
+        "temperature": 52.85,
+        "timestamp": 1781664332783
+      },
+      {
+        "id": 4,
+        "device_id": "DEV002",
+        "oxygen": 10.37,
+        "motor_speed": 68.4,
+        "temperature": 62.79,
+        "timestamp": 1781664392783
+      },
+      {
+        "id": 5,
+        "device_id": "DEV002",
+        "oxygen": 8.77,
+        "motor_speed": 62.1,
+        "temperature": 52.76,
+        "timestamp": 1781664452783
+      },
+      {
+        "id": 6,
+        "device_id": "DEV002",
+        "oxygen": 9.44,
+        "motor_speed": 78.3,
+        "temperature": 52.67,
+        "timestamp": 1781664512783
+      },
+      {
+        "id": 7,
+        "device_id": "DEV002",
+        "oxygen": 9.7,
+        "motor_speed": 66,
+        "temperature": 58.95,
+        "timestamp": 1781664572783
+      },
+      {
+        "id": 8,
+        "device_id": "DEV002",
+        "oxygen": 8.42,
+        "motor_speed": 73,
+        "temperature": 51.62,
+        "timestamp": 1781664632783
+      },
+      {
+        "id": 9,
+        "device_id": "DEV002",
+        "oxygen": 9.97,
+        "motor_speed": 69.1,
+        "temperature": 53.57,
+        "timestamp": 1781664692783
+      },
+      {
+        "id": 10,
+        "device_id": "DEV002",
+        "oxygen": 8.34,
+        "motor_speed": 56.6,
+        "temperature": 63.04,
+        "timestamp": 1781664752783
+      }
+    ],
+    "DEV003": [
+      {
+        "id": 1,
+        "device_id": "DEV003",
+        "oxygen": 20.7,
+        "motor_speed": 68.9,
+        "temperature": 52.59,
+        "timestamp": 1781664212783
+      },
+      {
+        "id": 2,
+        "device_id": "DEV003",
+        "oxygen": 19.66,
+        "motor_speed": 50.4,
+        "temperature": 55.92,
+        "timestamp": 1781664272783
+      },
+      {
+        "id": 3,
+        "device_id": "DEV003",
+        "oxygen": 18.99,
+        "motor_speed": 75.6,
+        "temperature": 62.52,
+        "timestamp": 1781664332783
+      },
+      {
+        "id": 4,
+        "device_id": "DEV003",
+        "oxygen": 23.89,
+        "motor_speed": 71.4,
+        "temperature": 64.73,
+        "timestamp": 1781664392783
+      },
+      {
+        "id": 5,
+        "device_id": "DEV003",
+        "oxygen": 21.86,
+        "motor_speed": 66.2,
+        "temperature": 50.51,
+        "timestamp": 1781664452783
+      },
+      {
+        "id": 6,
+        "device_id": "DEV003",
+        "oxygen": 18.12,
+        "motor_speed": 52.2,
+        "temperature": 60.41,
+        "timestamp": 1781664512783
+      },
+      {
+        "id": 7,
+        "device_id": "DEV003",
+        "oxygen": 21.81,
+        "motor_speed": 63.6,
+        "temperature": 62.88,
+        "timestamp": 1781664572783
+      },
+      {
+        "id": 8,
+        "device_id": "DEV003",
+        "oxygen": 21.16,
+        "motor_speed": 53.2,
+        "temperature": 64.35,
+        "timestamp": 1781664632783
+      },
+      {
+        "id": 9,
+        "device_id": "DEV003",
+        "oxygen": 18.97,
+        "motor_speed": 55,
+        "temperature": 56.52,
+        "timestamp": 1781664692783
+      },
+      {
+        "id": 10,
+        "device_id": "DEV003",
+        "oxygen": 20.08,
+        "motor_speed": 63.6,
+        "temperature": 59.84,
+        "timestamp": 1781664752783
+      }
+    ],
+    "DEV004": [
+      {
+        "id": 1,
+        "device_id": "DEV004",
+        "oxygen": 20.68,
+        "motor_speed": 0,
+        "temperature": 61.15,
+        "timestamp": 1781664212783
+      },
+      {
+        "id": 2,
+        "device_id": "DEV004",
+        "oxygen": 20.72,
+        "motor_speed": 0,
+        "temperature": 58.69,
+        "timestamp": 1781664272783
+      },
+      {
+        "id": 3,
+        "device_id": "DEV004",
+        "oxygen": 19.37,
+        "motor_speed": 0,
+        "temperature": 52.2,
+        "timestamp": 1781664332783
+      },
+      {
+        "id": 4,
+        "device_id": "DEV004",
+        "oxygen": 21.53,
+        "motor_speed": 0,
+        "temperature": 55.29,
+        "timestamp": 1781664392783
+      },
+      {
+        "id": 5,
+        "device_id": "DEV004",
+        "oxygen": 18.26,
+        "motor_speed": 0,
+        "temperature": 59.66,
+        "timestamp": 1781664452783
+      },
+      {
+        "id": 6,
+        "device_id": "DEV004",
+        "oxygen": 22.55,
+        "motor_speed": 0,
+        "temperature": 64.89,
+        "timestamp": 1781664512783
+      },
+      {
+        "id": 7,
+        "device_id": "DEV004",
+        "oxygen": 23.95,
+        "motor_speed": 0,
+        "temperature": 64.78,
+        "timestamp": 1781664572783
+      },
+      {
+        "id": 8,
+        "device_id": "DEV004",
+        "oxygen": 18.57,
+        "motor_speed": 0,
+        "temperature": 54.11,
+        "timestamp": 1781664632783
+      },
+      {
+        "id": 9,
+        "device_id": "DEV004",
+        "oxygen": 20.8,
+        "motor_speed": 0,
+        "temperature": 56.71,
+        "timestamp": 1781664692783
+      },
+      {
+        "id": 10,
+        "device_id": "DEV004",
+        "oxygen": 19.98,
+        "motor_speed": 0,
+        "temperature": 50.38,
+        "timestamp": 1781664752783
+      }
+    ],
+    "DEV005": [
+      {
+        "id": 1,
+        "device_id": "DEV005",
+        "oxygen": 18.68,
+        "motor_speed": 60.4,
+        "temperature": 45.48,
+        "timestamp": 1781664212783
+      },
+      {
+        "id": 2,
+        "device_id": "DEV005",
+        "oxygen": 19.44,
+        "motor_speed": 61.8,
+        "temperature": 57.6,
+        "timestamp": 1781664272783
+      },
+      {
+        "id": 3,
+        "device_id": "DEV005",
+        "oxygen": 20.75,
+        "motor_speed": 53.9,
+        "temperature": 59.08,
+        "timestamp": 1781664332783
+      },
+      {
+        "id": 4,
+        "device_id": "DEV005",
+        "oxygen": 18.08,
+        "motor_speed": 64,
+        "temperature": 45.22,
+        "timestamp": 1781664392783
+      },
+      {
+        "id": 5,
+        "device_id": "DEV005",
+        "oxygen": 19.19,
+        "motor_speed": 61.5,
+        "temperature": 50.08,
+        "timestamp": 1781664452783
+      },
+      {
+        "id": 6,
+        "device_id": "DEV005",
+        "oxygen": 23.14,
+        "motor_speed": 78,
+        "temperature": 62.1,
+        "timestamp": 1781664512783
+      },
+      {
+        "id": 7,
+        "device_id": "DEV005",
+        "oxygen": 23.01,
+        "motor_speed": 50.8,
+        "temperature": 49.14,
+        "timestamp": 1781664572783
+      },
+      {
+        "id": 8,
+        "device_id": "DEV005",
+        "oxygen": 19.08,
+        "motor_speed": 52.9,
+        "temperature": 56.85,
+        "timestamp": 1781664632783
+      },
+      {
+        "id": 9,
+        "device_id": "DEV005",
+        "oxygen": 22.25,
+        "motor_speed": 66.1,
+        "temperature": 52.5,
+        "timestamp": 1781664692783
+      },
+      {
+        "id": 10,
+        "device_id": "DEV005",
+        "oxygen": 22.51,
+        "motor_speed": 57.3,
+        "temperature": 54.1,
+        "timestamp": 1781664752783
+      }
+    ],
+    "DEV006": [
+      {
+        "id": 1,
+        "device_id": "DEV006",
+        "oxygen": 22.39,
+        "motor_speed": 63.4,
+        "temperature": 58.75,
+        "timestamp": 1781664212783
+      },
+      {
+        "id": 2,
+        "device_id": "DEV006",
+        "oxygen": 21.27,
+        "motor_speed": 67.8,
+        "temperature": 63.06,
+        "timestamp": 1781664272783
+      },
+      {
+        "id": 3,
+        "device_id": "DEV006",
+        "oxygen": 22.64,
+        "motor_speed": 54.8,
+        "temperature": 58.98,
+        "timestamp": 1781664332783
+      },
+      {
+        "id": 4,
+        "device_id": "DEV006",
+        "oxygen": 20.94,
+        "motor_speed": 66.9,
+        "temperature": 47.91,
+        "timestamp": 1781664392783
+      },
+      {
+        "id": 5,
+        "device_id": "DEV006",
+        "oxygen": 20.3,
+        "motor_speed": 79.9,
+        "temperature": 47.38,
+        "timestamp": 1781664452783
+      },
+      {
+        "id": 6,
+        "device_id": "DEV006",
+        "oxygen": 19.52,
+        "motor_speed": 50.6,
+        "temperature": 55.69,
+        "timestamp": 1781664512783
+      },
+      {
+        "id": 7,
+        "device_id": "DEV006",
+        "oxygen": 23.02,
+        "motor_speed": 69.8,
+        "temperature": 53.03,
+        "timestamp": 1781664572783
+      },
+      {
+        "id": 8,
+        "device_id": "DEV006",
+        "oxygen": 23.29,
+        "motor_speed": 52.5,
+        "temperature": 55.47,
+        "timestamp": 1781664632783
+      },
+      {
+        "id": 9,
+        "device_id": "DEV006",
+        "oxygen": 18.15,
+        "motor_speed": 59.5,
+        "temperature": 53.7,
+        "timestamp": 1781664692783
+      },
+      {
+        "id": 10,
+        "device_id": "DEV006",
+        "oxygen": 19.03,
+        "motor_speed": 56.1,
+        "temperature": 57.66,
+        "timestamp": 1781664752783
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "compost-monitor-backend",
+  "version": "1.0.0",
+  "description": "智能厨余垃圾降解机管理系统后端",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
